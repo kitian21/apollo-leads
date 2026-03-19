@@ -28,37 +28,37 @@ Busca empleados de una empresa y genera un CSV base.
 python main.py --mode search --company "HubSpot" --output data/raw/hubspot.csv
 ```
 
-Enrich
+### Enrich
 ```bash
 Toma un CSV generado por search y realiza enrichment sobre esos contactos.
 
 python main.py --mode enrich --input data/raw/hubspot.csv --output data/processed/hubspot_enriched.csv
 ```
-Output
+### Output
 Los archivos generados incluyen campos como
-full_name
-title
-company_name
-linkedin_url
-email
-phone
-location
-contact_status
-is_relevant_role
-has_email_flag
-has_direct_phone_flag
+- full_name
+- title
+- company_name
+- linkedin_url
+- email
+- phone
+- location
+- contact_status
+- is_relevant_role
+- has_email_flag
+- has_direct_phone_flag
 
-Nota importante
-La búsqueda no devuelve directamente emails ni teléfonos finales en todos los casos.
-Apollo puede devolver señales como has_email o has_direct_phone, pero eso no garantiza que el dato venga disponible en el enrichment inmediato.
-En la práctica, el email suele tener mejor cobertura que el teléfono.
+## Nota importante
+- La búsqueda no devuelve directamente emails ni teléfonos finales en todos los casos.
+- Apollo puede devolver señales como has_email o has_direct_phone, pero eso no garantiza que el dato venga disponible en el enrichment inmediato.
+- En la práctica, el email suele tener mejor cobertura que el teléfono.
 
-Instalación
+## Instalación
 ```bash
 pip install -r requirements.txt
 ```
 
-Configuración
+## Configuración
 Crea un archivo .env con:
 ```bash
 APOLLO_API_KEY=tu_api_key
