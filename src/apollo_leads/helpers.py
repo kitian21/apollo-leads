@@ -85,3 +85,39 @@ def extract_phone(person: Dict[str, Any]) -> Optional[str]:
                 return candidate
 
     return normalize_value(person.get("phone"))
+
+def is_relevant_role(title: str | None) -> str:
+    if not title:
+        return "No"
+
+    t = title.lower()
+
+    # Roles que SÍ interesan
+    relevant_keywords = [
+        "sales",
+        "marketing",
+        "growth",
+        "business development",
+        "revenue",
+        "commercial",
+        "partnership",
+    ]
+
+    # Roles que NO interesan
+    irrelevant_keywords = [
+        "hr",
+        "human resources",
+        "people",
+        "office",
+        "admin",
+        "support",
+        "customer service",
+    ]
+
+    if any(word in t for word in irrelevant_keywords):
+        return "No"
+
+    if any(word in t for word in relevant_keywords):
+        return "Yes"
+
+    return "No"

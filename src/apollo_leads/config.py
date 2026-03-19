@@ -23,4 +23,5 @@ OUTPUT_FIELDS = [
     "contact_status",
     "has_email_flag",
     "has_direct_phone_flag",
+    "is_relevant_role",
 ]

@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from .client import ApolloClient
 from .config import TARGET_TITLES
 from .helpers import (
+    is_relevant_role,
     normalize_value,
     build_full_name,
     extract_location,
@@ -44,6 +45,7 @@ def normalize_person_record(person: Dict[str, Any], fallback_company_name: str) 
         "contact_status": get_contact_status(email, phone),
         "has_email_flag": normalize_value(person.get("has_email")),
         "has_direct_phone_flag": normalize_value(person.get("has_direct_phone")),
+        "is_relevant_role": is_relevant_role(title),
     }
 
 
