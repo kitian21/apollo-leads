@@ -14,7 +14,6 @@ OUTPUT_FIELDS = [
     "apollo_person_id",
     "full_name",
     "title",
-    "seniority",
     "company_name",
     "linkedin_url",
     "email",
