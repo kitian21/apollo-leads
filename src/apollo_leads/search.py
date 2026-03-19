@@ -15,7 +15,6 @@ from .helpers import (
 def normalize_person_record(person: Dict[str, Any], fallback_company_name: str) -> Dict[str, Any]:
     full_name = build_full_name(person)
     title = normalize_value(person.get("title"))
-    seniority = normalize_value(person.get("seniority"))
 
     company_name = (
         normalize_value(person.get("organization", {}).get("name"))
@@ -36,7 +35,6 @@ def normalize_person_record(person: Dict[str, Any], fallback_company_name: str) 
         "apollo_person_id": normalize_value(person.get("id")),
         "full_name": full_name,
         "title": title,
-        "seniority": seniority,
         "company_name": company_name,
         "linkedin_url": linkedin_url,
         "email": email,

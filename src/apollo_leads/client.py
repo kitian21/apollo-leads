@@ -61,3 +61,14 @@ class ApolloClient:
             },
         )
         return data.get("people") or []
+    
+    def bulk_enrich_people(self, ids: list[str]) -> list[dict]:
+        if not ids:
+            return []
+
+        payload = {
+            "details": [{"id": person_id} for person_id in ids]
+        }
+
+        data = self.post("people/bulk_match", payload)
+        return data.get("people") or data.get("matches") or []
