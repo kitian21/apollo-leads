@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-APOLLO_API_KEY = os.getenv("hSbW7QyQBQtIB_I0jGjPlA", "hSbW7QyQBQtIB_I0jGjPlA")
+APOLLO_API_KEY = os.getenv("APOLLO_API_KEY")
 APOLLO_BASE_URL = os.getenv("APOLLO_BASE_URL", "https://api.apollo.io/api/v1")
 
 TARGET_TITLES = ["Manager", "Director", "Head", "VP"]
@@ -15,9 +15,9 @@ OUTPUT_FIELDS = [
     "full_name",
     "title",
     "company_name",
-    "linkedin_url",
     "email",
     "phone",
+    "linkedin_url",
     "location",
     "contact_status",
     "has_email_flag",
