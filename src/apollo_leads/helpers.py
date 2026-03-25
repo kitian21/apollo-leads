@@ -92,26 +92,19 @@ def is_relevant_role(title: str | None) -> str:
 
     t = title.lower()
 
-    # Roles que SÍ interesan
+    # Roles que SÍ interesan para el análisis
     relevant_keywords = [
-        "sales",
-        "marketing",
-        "growth",
-        "business development",
-        "revenue",
-        "commercial",
-        "partnership",
+        "adquisiciones", "compras", "procurement", "buyer", "purchasing",
+        "administrador", "administración", "admin", "administration",
+        "logística", "logistics", "supply chain", "operaciones", "operations",
+        "finanzas", "finance"
     ]
 
-    # Roles que NO interesan
+    # Roles que NO interesan (Descartamos ventas y áreas blandas)
     irrelevant_keywords = [
-        "hr",
-        "human resources",
-        "people",
-        "office",
-        "admin",
-        "support",
-        "customer service",
+        "sales", "ventas", "marketing", "comercial", "commercial",
+        "growth", "business development", "revenue",
+        "hr", "recursos humanos", "people", "customer service"
     ]
 
     if any(word in t for word in irrelevant_keywords):

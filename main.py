@@ -11,6 +11,8 @@ def main():
     parser.add_argument("--company", type=str, help="Empresa a buscar")
     parser.add_argument("--input", type=str, help="Archivo CSV de entrada")
     parser.add_argument("--output", type=str, default="data/raw/output.csv")
+    
+    parser.add_argument("--limit", type=int, default=100, help="Límite máximo de leads a buscar")
 
     parser.add_argument("--mode", type=str, choices=["search", "enrich"], required=True)
 
@@ -21,10 +23,10 @@ def main():
             print("[ERROR] Debes usar --company en modo search")
             return
 
-        records = run_search(args.company)
+        records = run_search(args.company, limit=args.limit)
         export_to_csv(records, args.output)
 
-        print(f"[OK] Search completo: {args.output}")
+        print(f"[OK] Search completo: {args.output} ({len(records)} registros extraídos)")
 
     elif args.mode == "enrich":
         if not args.input:
