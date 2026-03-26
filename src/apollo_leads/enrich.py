@@ -178,8 +178,8 @@ def run_enrichment(input_file: str, output_file: str) -> None:
     for batch in batches:
         enriched_people = client.bulk_enrich_people(batch)
 
-        if enriched_people:
-            print("[DEBUG] Primer enriched person:", enriched_people[0])
+        # if enriched_people:
+        #     print("[DEBUG] Primer enriched person:", enriched_people[0])
 
         for person in enriched_people:
             person_id = normalize_value(person.get("id"))

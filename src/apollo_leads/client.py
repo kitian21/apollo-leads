@@ -57,6 +57,7 @@ class ApolloClient:
             {
                 "q_organization_name": company_name,
                 "person_titles": titles,
+                "person_seniorities": ["manager", "director", "head", "vp", "c_suite"],
                 "page": page,
                 "per_page": per_page,
             },
