@@ -1,4 +1,5 @@
 from typing import Any, Dict, List
+from tqdm import tqdm
 
 from .client import ApolloClient
 from .config import TARGET_TITLES
@@ -72,9 +73,10 @@ def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
     page = 1
     per_page = 25
 
-    print(f"[INFO] Buscando leads en {company['company_name']}...")
+    print(f"[INFO] Buscando perfiles administrativos y de compras en {company['company_name']}...")
 
-    # Implementación de paginación para no perder leads
+    pbar = tqdm(total=limit, desc="Buscando leads", unit="lead")
+
     while len(all_people) < limit:
         raw_people = client.search_people(
             company_name=company["company_name"],
@@ -86,15 +88,19 @@ def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
         if not raw_people:
             break
 
-        all_people.extend(raw_people)
-        print(f"[DEBUG] Página {page} trajo {len(raw_people)} registros. Acumulado: {len(all_people)}")
+        leads_faltantes = limit - len(all_people)
+        leads_a_agregar = raw_people[:leads_faltantes]
+        
+        all_people.extend(leads_a_agregar)
+        
+        pbar.update(len(leads_a_agregar))
 
         if len(raw_people) < per_page:
             break
         
         page += 1
 
-    all_people = all_people[:limit]
+    pbar.close() 
 
     return [
         normalize_person_record(person, fallback_company_name=company["company_name"])

@@ -1,5 +1,6 @@
 import csv
 from typing import List, Dict, Any
+from tqdm import tqdm
 
 from .client import ApolloClient
 from .helpers import normalize_value, get_contact_status
@@ -109,6 +110,53 @@ def merge_record_with_enrichment(
 
 
 def run_enrichment(input_file: str, output_file: str) -> None:
+    client = ApolloClient()
+    records = load_csv(input_file)
+
+    people_ids = [
+        r["apollo_person_id"]
+        for r in records
+        if normalize_value(r.get("apollo_person_id"))
+    ]
+
+    if not people_ids:
+        print("[WARNING] No se encontraron apollo_person_id válidos en el CSV.")
+        return
+
+    batches = chunk_list(people_ids, 10)
+    enriched_map: Dict[str, Dict[str, Any]] = {}
+
+    print(f"[INFO] Enriqueciendo {len(people_ids)} contactos...")
+
+    for batch in tqdm(batches, desc="Enriqueciendo leads", unit="lote"):
+        enriched_people = client.bulk_enrich_people(batch)
+
+        for person in enriched_people:
+            person_id = normalize_value(person.get("id"))
+            if person_id:
+                enriched_map[person_id] = person
+
+    final_records: List[Dict[str, Any]] = []
+
+    for record in records:
+        person_id = normalize_value(record.get("apollo_person_id"))
+        enriched = enriched_map.get(person_id, {})
+
+        if enriched:
+            updated_record = merge_record_with_enrichment(record, enriched)
+        else:
+            email = normalize_value(record.get("email"))
+            phone = normalize_value(record.get("phone"))
+            record["contact_status"] = get_contact_status(email, phone)
+            record["email_status"] = None
+            record["seniority"] = None
+            record["departments"] = None
+            updated_record = record
+
+        final_records.append(updated_record)
+
+    save_csv(final_records, output_file)
+    print(f"\n[OK] Enrichment completo: {output_file}")
     client = ApolloClient()
     records = load_csv(input_file)
 
