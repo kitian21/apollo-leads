@@ -6,18 +6,28 @@ __pycache__/
 *.egg-info/
 .venv/
 venv/
+env/
+build/
+dist/
 
-# Environment
+# Variables de entorno (¡CRÍTICO para proteger tu APOLLO_API_KEY!)
 .env
+.env.*
 
-# IDEs
+# Logs y Caché
+*.log
+.pytest_cache/
+
+# Entornos de Desarrollo (IDEs)
 .vscode/
 .idea/
+*.swp
 
-# Data outputs
+# Data outputs (¡Vital para no subir los leads de In-Data al repo!)
 data/raw/*.csv
 data/processed/*.csv
+data/
 
-# OS
+# Archivos del Sistema Operativo
 .DS_Store
 Thumbs.db
