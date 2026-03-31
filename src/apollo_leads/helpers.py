@@ -92,27 +92,29 @@ def is_relevant_role(title: str | None) -> str:
 
     t = title.lower()
 
-    # Roles que SÍ interesan (Áreas de poder y compras)
-    relevant_keywords = [
-        "adquisiciones", "compras", "procurement", "buyer", "purchasing",
-        "administrador", "administración", "admin", "administration",
-        "logística", "logistics", "supply chain", "operaciones", "operations",
-        "finanzas", "finance", "gerente", "manager", "director", "head", "Warehouse"
-    ]
-
+    # 1. BLOQUEO LETAL: Si tiene alguna de estas palabras, se rechaza de inmediato.
     irrelevant_keywords = [
-        "sales", "ventas", "marketing", "comercial", "commercial",
-        "growth", "business development", "revenue",
-        "hr", "recursos humanos", "people", "customer service",
-        
-        "supervisor", "asistente", "assistant", "analista", "analyst", 
-        "practicante", "intern", "coordinador", "coordinator", "ejecutivo", 
-        "executive", "auxiliar", "soporte", "support", "operador", "operator", 
-        "técnico", "technician", "planner", "controlador", "turno", "shift"
+        "asistente", "assistant", "analista", "analyst", "practicante",
+        "intern", "coordinador", "coordinator", "ejecutivo", "executive",
+        "auxiliar", "soporte", "support", "operador", "operator", 
+        "técnico", "technician", "planner", "controlador", "turno", "shift",
+        "supervisor", "junior", "trainee"
     ]
 
     if any(word in t for word in irrelevant_keywords):
         return "No"
+
+    # 2. ÁREAS Y CARGOS DE PODER: Si pasa el filtro anterior y tiene estas palabras, se aprueba.
+    relevant_keywords = [
+        # Cargos de poder absoluto
+        "gerente", "manager", "director", "head", "chief", "vp", "presidente",
+        "socio", "partner", "dueño", "owner", "founder", "fundador",
+        # Áreas clave para el análisis
+        "obra", "obras", "construcción", "construction", "site",
+        "operaciones", "operations", "adquisiciones", "compras", 
+        "procurement", "purchasing", "logística", "logistics", 
+        "supply chain", "finanzas", "finance", "administrador", "admin"
+    ]
 
     if any(word in t for word in relevant_keywords):
         return "Yes"

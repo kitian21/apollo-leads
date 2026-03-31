@@ -6,13 +6,6 @@ load_dotenv()
 APOLLO_API_KEY = os.getenv("", "")
 APOLLO_BASE_URL = os.getenv("APOLLO_BASE_URL", "https://api.apollo.io/api/v1")
 
-TARGET_TITLES = [
-    "Administrador", "Administración", "Administration", "Admin",
-    "Adquisiciones", "Compras", "Procurement", "Purchasing", "Buyer",
-    "Logística", "Logistics", "Supply Chain", "Operaciones", "Operations",
-    "Warehouse",
-]
-
 EMPTY_VALUES = {None, "", "N/A", "n/a", "NA", "None", "-"}
 
 OUTPUT_FIELDS = [

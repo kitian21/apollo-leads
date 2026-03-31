@@ -2,7 +2,6 @@ from typing import Any, Dict, List
 from tqdm import tqdm
 
 from .client import ApolloClient
-from .config import TARGET_TITLES
 from .helpers import (
     is_relevant_role,
     normalize_value,
@@ -67,7 +66,6 @@ def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
     while len(all_people) < limit:
         raw_people = client.search_people(
             company_name=company["company_name"],
-            titles=TARGET_TITLES,
             page=page,
             per_page=per_page,
         )

@@ -50,13 +50,12 @@ class ApolloClient:
             "raw": company,
         }
 
-    def search_people(self, company_name: str, titles: List[str], page: int = 1, per_page: int = 25) -> List[Dict[str, Any]]:
+    def search_people(self, company_name: str, page: int = 1, per_page: int = 25) -> List[Dict[str, Any]]:
         data = self.post(
             "mixed_people/api_search",
             {
                 "q_organization_name": company_name,
-                "person_titles": titles,
-                "person_seniorities": ["manager", "director", "head", "vp", "c_suite"],
+                "person_seniorities": ["manager", "director", "head", "vp", "c_suite", "founder", "owner", "partner"],
                 "page": page,
                 "per_page": per_page,
             },
