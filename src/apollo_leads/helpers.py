@@ -98,7 +98,10 @@ def is_relevant_role(title: str | None) -> str:
         "intern", "coordinador", "coordinator", "ejecutivo", "executive",
         "auxiliar", "soporte", "support", "operador", "operator", 
         "técnico", "technician", "planner", "controlador", "turno", "shift",
-        "supervisor", "junior", "trainee"
+        "supervisor", "junior", "trainee", "sales", "ventas", "marketing",
+        "reclutamiento", "recruitment", "recursos humanos", "human resources",
+        "proyecto", "project", "calidad", "quality", "seguridad", "safety",
+        "construction"
     ]
 
     if any(word in t for word in irrelevant_keywords):
