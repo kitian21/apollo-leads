@@ -19,7 +19,6 @@ class ApolloClient:
     def post(self, endpoint: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         url = f"{self.base_url}/{endpoint}"
         
-        # 🚀 Usamos self.session en lugar de requests directamente
         response = self.session.post(url, json=payload, timeout=30)
 
         if response.status_code != 200:

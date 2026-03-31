@@ -97,7 +97,7 @@ def is_relevant_role(title: str | None) -> str:
         "adquisiciones", "compras", "procurement", "buyer", "purchasing",
         "administrador", "administración", "admin", "administration",
         "logística", "logistics", "supply chain", "operaciones", "operations",
-        "finanzas", "finance", "gerente", "manager", "director", "head"
+        "finanzas", "finance", "gerente", "manager", "director", "head", "Warehouse"
     ]
 
     irrelevant_keywords = [

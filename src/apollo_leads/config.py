@@ -9,7 +9,8 @@ APOLLO_BASE_URL = os.getenv("APOLLO_BASE_URL", "https://api.apollo.io/api/v1")
 TARGET_TITLES = [
     "Administrador", "Administración", "Administration", "Admin",
     "Adquisiciones", "Compras", "Procurement", "Purchasing", "Buyer",
-    "Logística", "Logistics", "Supply Chain", "Operaciones", "Operations"
+    "Logística", "Logistics", "Supply Chain", "Operaciones", "Operations",
+    "Warehouse",
 ]
 
 EMPTY_VALUES = {None, "", "N/A", "n/a", "NA", "None", "-"}
@@ -18,11 +19,8 @@ OUTPUT_FIELDS = [
     "apollo_person_id",
     "full_name",
     "title",
-    "seniority",
-    "departments",
     "company_name",
     "email",
-    "email_status",
     "phone",
     "linkedin_url",
     "location",

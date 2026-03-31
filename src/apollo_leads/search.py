@@ -32,26 +32,13 @@ def normalize_person_record(person: Dict[str, Any], fallback_company_name: str) 
     phone = extract_phone(person)
     location = extract_location(person)
 
-    # --- NUEVOS CAMPOS CAPTURADOS EN SEARCH ---
-    seniority = normalize_value(person.get("seniority"))
-    email_status = normalize_value(person.get("email_status"))
-    
-    departments_raw = person.get("departments")
-    if isinstance(departments_raw, list) and departments_raw:
-        departments = ", ".join([str(d) for d in departments_raw if d])
-    else:
-        departments = None
-
     return {
         "apollo_person_id": normalize_value(person.get("id")),
         "full_name": full_name,
         "title": title,
-        "seniority": seniority,
-        "departments": departments,
         "company_name": company_name,
         "linkedin_url": linkedin_url,
         "email": email,
-        "email_status": email_status,
         "phone": phone,
         "location": location,
         "contact_status": get_contact_status(email, phone),
@@ -88,7 +75,6 @@ def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
         if not raw_people:
             break
 
-        # 🚨 EL FILTRO ESTRICTO EN PYTHON 🚨
         # Evaluamos uno por uno y descartamos inmediatamente a los que no sirven
         valid_people = []
         for person in raw_people:
