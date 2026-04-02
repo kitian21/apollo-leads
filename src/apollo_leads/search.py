@@ -50,22 +50,34 @@ def normalize_person_record(person: Dict[str, Any], fallback_company_name: str) 
 def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
     client = ApolloClient()
 
-    company = client.find_company(company_input)
-    if not company:
-        print(f"[WARNING] No fue posible identificar la empresa: {company_input}")
+    company_data = client.find_company(company_input)
+    
+    # 1. Validamos si Apollo encontró algo
+    if not company_data:
+        print(f"[WARNING] No se encontró resultado para: {company_input}")
         return []
+
+    # 2. 🚀 FILTRO DE LITERALIDAD TOTAL
+    # Comparamos lo que tú escribiste (company_input) con lo que Apollo devolvió (name)
+    # Si hay una mínima diferencia en mayúsculas o espacios, lo rechaza.
+    if company_data.get("name") != company_input:
+        print(f"[SKIP] Se descartó '{company_data.get('name')}' porque no coincide exactamente con '{company_input}'")
+        return []
+
+    # Si pasó el filtro, asignamos la variable para el resto del código
+    company = company_data
 
     all_people = []
     page = 1
     per_page = 25
 
-    print(f"[INFO] Buscando perfiles de alta gerencia en {company['company_name']}...")
+    print(f"[INFO] Buscando perfiles de alta gerencia en {company['name']}...")
 
     pbar = tqdm(total=limit, desc="Buscando leads", unit="lead")
 
     while len(all_people) < limit:
         raw_people = client.search_people(
-            company_name=company["company_name"],
+            company_name=company["name"],
             page=page,
             per_page=per_page,
         )
@@ -99,6 +111,6 @@ def run_search(company_input: str, limit: int = 100) -> List[Dict[str, Any]]:
     pbar.close()
 
     return [
-        normalize_person_record(person, fallback_company_name=company["company_name"])
+        normalize_person_record(person, fallback_company_name=company.get("name", ""))
         for person in all_people
     ]

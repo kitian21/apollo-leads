@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 from typing import List, Dict, Any
 from tqdm import tqdm
+import json
 
 from .client import ApolloClient
 from .helpers import normalize_value, get_contact_status
@@ -130,13 +131,32 @@ def run_enrichment(input_path: str, output_file: str) -> None:
 
     print(f"[INFO] Enriqueciendo {len(people_ids)} contactos en bloque...")
 
+    batches = chunk_list(people_ids, 10)
+    enriched_map: Dict[str, Dict[str, Any]] = {}
+
+    print(f"[INFO] Enriqueciendo {len(people_ids)} contactos en bloque...")
+
+    # 🚀 1. Creamos una lista vacía antes del ciclo
+    todas_las_radiografias = []
+
     for batch in tqdm(batches, desc="Enriqueciendo leads", unit="lote"):
         enriched_people = client.bulk_enrich_people(batch)
+
+        # 🚀 2. Acumulamos los perfiles de este lote en la lista maestra
+        todas_las_radiografias.extend(enriched_people)
 
         for person in enriched_people:
             person_id = normalize_value(person.get("id"))
             if person_id:
                 enriched_map[person_id] = person
+
+    # 🚀 3. Guardamos el archivo UNA SOLA VEZ al terminar todo el ciclo
+    with open("radiografia_apollo.json", "w", encoding="utf-8") as f:
+        json.dump(todas_las_radiografias, f, indent=4, ensure_ascii=False)
+    
+    print(f"\n[OK] ¡Radiografía completa de {len(todas_las_radiografias)} contactos guardada en 'radiografia_apollo.json'!")
+
+    # ... (aquí sigue el resto de tu código normal creando final_records)
 
     final_records: List[Dict[str, Any]] = []
 

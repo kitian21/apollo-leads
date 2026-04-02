@@ -101,7 +101,11 @@ def is_relevant_role(title: str | None) -> str:
         "supervisor", "junior", "trainee", "sales", "ventas", "marketing",
         "reclutamiento", "recruitment", "recursos humanos", "human resources",
         "proyecto", "project", "calidad", "quality", "seguridad", "safety",
-        "construction"
+        "construction", "plaza", "digital", "it", "tecnología", "technology",
+        "sistemas", "systems", "Content", "contenido", "comunicaciones",
+        "communications", "legal", "comercial", "commercial", "creative", "creativo",
+        "community", "comunidad", "technical", "técnico", "Accounts", "cuentas",
+        "customer service", "servicio al cliente",
     ]
 
     if any(word in t for word in irrelevant_keywords):
@@ -113,8 +117,7 @@ def is_relevant_role(title: str | None) -> str:
         "gerente", "manager", "director", "head", "chief", "vp", "presidente",
         "socio", "partner", "dueño", "owner", "founder", "fundador",
         # Áreas clave para el análisis
-        "obra", "obras", "construcción", "construction", "site",
-        "operaciones", "operations", "adquisiciones", "compras", 
+        "obra", "obras", "site", "operaciones", "operations", "adquisiciones",
         "procurement", "purchasing", "logística", "logistics", 
         "supply chain", "finanzas", "finance", "administrador", "admin"
     ]

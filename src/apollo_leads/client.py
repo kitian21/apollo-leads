@@ -28,27 +28,35 @@ class ApolloClient:
 
         return response.json()
 
-    def find_company(self, company_input: str) -> Optional[Dict[str, Any]]:
+    def find_company(self, company_name: str) -> Dict[str, Any] | None:
         data = self.post(
-            "mixed_companies/search",
+            "organizations/search",
             {
-                "q_organization_name": company_input,
-                "page": 1,
-                "per_page": 10,
+                "q_organization_name": company_name,
             },
         )
-
-        organizations = data.get("organizations") or data.get("accounts") or []
-        if not organizations:
+        
+        orgs = data.get("organizations") or []
+        if not orgs:
             return None
 
-        company = organizations[0]
-        return {
-            "company_id": company.get("id"),
-            "company_name": company.get("name"),
-            "domain": company.get("website_url") or company.get("primary_domain") or company.get("domain"),
-            "raw": company,
-        }
+        # Convertimos tu input a minúsculas y quitamos espacios a los lados
+        target_exacto = company_name.strip().lower()
+
+        print(f"   -> [Buscando Match Estricto: '{company_name}']")
+
+        for org in orgs:
+            # Obtenemos el nombre exacto de Apollo
+            apollo_name = (org.get("name") or "").strip().lower()
+            
+            # 🚀 REGLA DE ORO: Solo pasa si son idénticos. Si sobra una letra, no entra.
+            if apollo_name == target_exacto:
+                print(f"   -> [Aprobado] Match exacto encontrado: {org.get('name')}")
+                return org
+
+        # Si termina de revisar y ninguno es exactamente igual a tu lista, se bloquea.
+        print(f"   -> [Bloqueado] Apollo devolvió opciones, pero ninguna es exactamente '{company_name}'.")
+        return None
 
     def search_people(self, company_name: str, page: int = 1, per_page: int = 25) -> List[Dict[str, Any]]:
         data = self.post(
