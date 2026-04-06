@@ -6,6 +6,12 @@ load_dotenv()
 APOLLO_API_KEY = os.getenv("", "")
 APOLLO_BASE_URL = os.getenv("APOLLO_BASE_URL", "https://api.apollo.io/api/v1")
 
+# Nuevas credenciales de AWS
+APOLLO_WEBHOOK_URL = ""
+AWS_ACCESS_KEY = "" # Pega tu Access Key aquí
+AWS_SECRET_KEY = ""     # Pega tu Secret Key aquí
+AWS_REGION = "us-east-2"
+
 EMPTY_VALUES = {None, "", "N/A", "n/a", "NA", "None", "-"}
 
 OUTPUT_FIELDS = [
