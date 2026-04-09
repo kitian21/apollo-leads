@@ -8,11 +8,11 @@ from pathlib import Path
 # Importaciones de tu proyecto en In-Data
 from .client import ApolloClient
 from .helpers import normalize_value, get_contact_status
-from .config import APOLLO_API_KEY, AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
+from .config import AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
 
 # Configuración de AWS y archivos temporales
 BUCKET_NAME = "baudata-2025"
-MAILBOX_KEY = "apollo-contacts/temp/telefonos_recibidos.json"
+MAILBOX_KEY = "apollo-contacts/phone_numbers/telefonos_recibidos.json"
 PATH_SIN_ENRIQUECER = Path("data/temp/peticion_sin_enriquecer.json")
 PATH_ENRIQUECIDO = Path("data/temp/peticion_enriquecida.json")
 
