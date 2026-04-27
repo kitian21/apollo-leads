@@ -45,9 +45,9 @@ def run_enrichment(input_file: str, output_file: str):
 
         # Guardamos el JSON 2 (Enriquecido con lo que dio la API al instante)
         save_json_local(data_api_map, PATH_ENRIQUECIDO)
-        print(f"💾 JSON 2 (Enriquecido) guardado con info de la API.")
+        print(f"💾 JSON 2 (Enriquecido parcial) guardado con info de la API.")
 
-        # 3. ESPERA DEL NÚMERO CELULAR (Desde AWS S3)
+        # 3. ESPERA DEL NÚMERO CELULAR (Desde AWS S3 - Ajustado a 3 min)
         s3 = boto3.client('s3', region_name=AWS_REGION, 
                          aws_access_key_id=AWS_ACCESS_KEY, 
                          aws_secret_access_key=AWS_SECRET_KEY)
@@ -56,18 +56,20 @@ def run_enrichment(input_file: str, output_file: str):
         try: s3.delete_object(Bucket=BUCKET_NAME, Key=MAILBOX_KEY)
         except: pass
 
-        print(f"⏳ Esperando que el Lambda entregue los números celulares en S3...")
+        print(f"⏳ Esperando confirmación de números celulares (Tiempo máximo: 2 minutos)...")
         
+        telefonos_map = {}
         intentos = 0
-        while intentos < 30:
-            time.sleep(20)
+        max_intentos = 8  # 8 intentos de 15 segundos = 2 minutos
+        
+        while intentos < max_intentos:
+            time.sleep(15)
             try:
                 res_s3 = s3.get_object(Bucket=BUCKET_NAME, Key=MAILBOX_KEY)
                 # El Lambda solo envía {id: numero} o una lista de contactos con solo el número
                 data_aws = json.loads(res_s3['Body'].read().decode('utf-8'))
                 
                 # Normalizamos lo que venga de AWS (si es lista lo pasamos a dict)
-                telefonos_map = {}
                 if isinstance(data_aws, list):
                     for item in data_aws:
                         if isinstance(item, dict) and item.get('id'):
@@ -79,48 +81,52 @@ def run_enrichment(input_file: str, output_file: str):
                 else:
                     telefonos_map = data_aws
 
-                print(f"📥 ¡Números recibidos! Sumando celulares al Excel final...")
-
-                # 4. CRUCE FINAL HÍBRIDO (CSV + API + AWS)
-                for idx, row in df.iterrows():
-                    p_id = row['apollo_person_id']
-                    
-                    # A. Sumamos info de la API (Email, LinkedIn, Cargo)
-                    if p_id in data_api_map:
-                        p = data_api_map[p_id]
-                        if p.get("email"): df.at[idx, 'email'] = p["email"]
-                        if p.get("linkedin_url"): df.at[idx, 'linkedin_url'] = p["linkedin_url"]
-                        if p.get("title"): df.at[idx, 'title'] = p["title"]
-                        if p.get("name"): df.at[idx, 'full_name'] = p["name"]
-
-                    # B. Sumamos el número celular de AWS
-                    if p_id in telefonos_map:
-                        celular = str(telefonos_map[p_id]).strip()
-                        if celular and celular != "None":
-                            # El apóstrofe protege el número para que Excel no lo rompa
-                            df.at[idx, 'phone'] = f"'{celular}"
-
-                    # C. Recalculamos el status final
-                    e_final = str(df.at[idx, 'email']).strip()
-                    t_final = str(df.at[idx, 'phone']).replace("'", "").strip()
-                    df.at[idx, 'contact_status'] = get_contact_status(e_final, t_final)
-
-                # 5. GUARDAR RESULTADO
-                df.to_csv(output_file, sep=';', index=False, encoding='utf-8-sig')
-                print(f"🚀 ¡Éxito! Base de Baudata completa con números celulares: {output_file}")
-                
+                print(f"📥 ¡AWS respondió en el intento {intentos + 1}! Procesando números...")
                 s3.delete_object(Bucket=BUCKET_NAME, Key=MAILBOX_KEY)
-                return
+                break
 
             except s3.exceptions.NoSuchKey:
                 intentos += 1
-                if intentos % 3 == 0:
-                    print(f"   ... S3 aún sin números, Apollo procesando (intento {intentos}/30)")
+                if intentos % 4 == 0:
+                    min_transcurridos = (intentos * 15) // 60
+                    print(f"   ... S3 aún sin números ({min_transcurridos} min transcurridos)")
             except Exception as e:
-                print(f"❌ Error durante el cruce: {e}")
+                print(f"❌ Error leyendo S3: {e}")
                 break
 
-        print("⚠️ Se agotó el tiempo de espera para los números.")
+        # PLAN DE CONTINGENCIA
+        if intentos >= max_intentos:
+            print("⚠️ Límite de 3 minutos alcanzado. No llegaron teléfonos desde Apollo.")
+            print("➡️ Avanzando al guardado con la información rescatada...")
+
+        # 4. CRUCE FINAL HÍBRIDO (Se ejecuta siempre)
+        print("🔄 Realizando cruce de información en el CSV...")
+        for idx, row in df.iterrows():
+            p_id = row['apollo_person_id']
+            
+            # A. Sumamos info de la API (Email, LinkedIn, Cargo)
+            if p_id in data_api_map:
+                p = data_api_map[p_id]
+                if p.get("email"): df.at[idx, 'email'] = p["email"]
+                if p.get("linkedin_url"): df.at[idx, 'linkedin_url'] = p["linkedin_url"]
+                if p.get("title"): df.at[idx, 'title'] = p["title"]
+                if p.get("name"): df.at[idx, 'full_name'] = p["name"]
+
+            # B. Sumamos el número celular de AWS (si existe)
+            if p_id in telefonos_map:
+                celular = str(telefonos_map[p_id]).strip()
+                if celular and celular != "None":
+                    # El apóstrofe protege el número para que Excel no lo rompa
+                    df.at[idx, 'phone'] = f"'{celular}"
+
+            # C. Recalculamos el status final
+            e_final = str(df.at[idx, 'email']).strip()
+            t_final = str(df.at[idx, 'phone']).replace("'", "").strip()
+            df.at[idx, 'contact_status'] = get_contact_status(e_final, t_final)
+
+        # 5. GUARDAR RESULTADO (Garantizado)
+        df.to_csv(output_file, sep=';', index=False, encoding='utf-8-sig')
+        print(f"🚀 ¡Éxito! Archivo de data mining generado en: {output_file}")
 
     except Exception as e:
         print(f"[ERROR CRÍTICO] {e}")
